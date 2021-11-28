@@ -19,8 +19,8 @@ namespace ProgrammersBlog.Data.Concrete.EntityFramework.Contexts
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseSqlServer(connectionString: @"Data Source=(localdb)\ProjectsV13;Database=ProgrammerBlog;Initial 
-                                                          Catalog=master;Integrated Security=True;Connect Timeout=30;
+			optionsBuilder.UseSqlServer(connectionString: @"Data Source=(localdb)\ProjectsV13;Database=ProgrammerBlog;
+                                                          Integrated Security=True;Connect Timeout=30;
                                                           Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;
                                                           MultiSubnetFailover=False");
 		}
