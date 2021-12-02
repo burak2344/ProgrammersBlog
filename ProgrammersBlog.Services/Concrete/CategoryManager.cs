@@ -38,7 +38,7 @@ namespace ProgrammersBlog.Services.Concrete
 		public async Task<IResult> Delete(int categoryId, string modifiedByName)
 		{
 			var category = await _unitOfWork.Categories.GetAsync(c => c.Id == categoryId);
-			if (category!=null)
+			if (category != null)
 			{
 				category.IsDeleted = true;
 				category.ModifiedByName = modifiedByName;
@@ -57,7 +57,7 @@ namespace ProgrammersBlog.Services.Concrete
 				return new DataResult<CategoryDto>(ResultStatus.Success, new CategoryDto
 				{
 					Category = category,
-					ResultStatus=ResultStatus.Success
+					ResultStatus = ResultStatus.Success
 
 				});
 			}
@@ -69,13 +69,18 @@ namespace ProgrammersBlog.Services.Concrete
 			var categories = await _unitOfWork.Categories.GetAllAsync(null, c => c.Articles);
 			if (categories.Count > -1)
 			{
-				return new DataResult<CategoryListDto>(ResultStatus.Success, new CategoryListDto 
+				return new DataResult<CategoryListDto>(ResultStatus.Success, new CategoryListDto
 				{
 					Categories = categories,
 					ResultStatus = ResultStatus.Success
 				});
 			}
-			return new DataResult<CategoryListDto>(ResultStatus.Error, "Hiç bir kategori bulunamadı.", null);
+			return new DataResult<CategoryListDto>(ResultStatus.Error, "Hiç bir kategori bulunamadı.", new CategoryListDto
+			{
+			       Categories=null,
+				   ResultStatus=ResultStatus.Error,
+				   Message= "Hiç bir kategori bulunamadı."
+			});
 		}
 
 		public async Task<IDataResult<CategoryListDto>> GetAllByNonDeleted()
@@ -83,7 +88,7 @@ namespace ProgrammersBlog.Services.Concrete
 			var categories = await _unitOfWork.Categories.GetAllAsync(c => !c.IsDeleted, c => c.Articles);
 			if (categories.Count > -1)
 			{
-				return new DataResult<CategoryListDto>(ResultStatus.Success, new CategoryListDto 
+				return new DataResult<CategoryListDto>(ResultStatus.Success, new CategoryListDto
 				{
 					Categories = categories,
 					ResultStatus = ResultStatus.Success
@@ -123,7 +128,7 @@ namespace ProgrammersBlog.Services.Concrete
 			category.ModifiedByName = modifiedByName;
 			await _unitOfWork.Categories.UpdateAsync(category).ContinueWith(t => _unitOfWork.SaveAsync());
 			return new Result(ResultStatus.Success, $"{categoryUpdateDto.Name} adlı kategori başarılı bir şekilde güncellenmiştir.");
-			
+
 		}
 	}
 }
