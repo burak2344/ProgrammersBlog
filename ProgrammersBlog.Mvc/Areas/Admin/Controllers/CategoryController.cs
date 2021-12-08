@@ -27,7 +27,7 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
 		{
 			var result = await _categoryService.GetAll();
 			return View(result.Data);
-			
+
 		}
 		[HttpGet]
 		public IActionResult Add()
@@ -39,13 +39,13 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var result = await _categoryService.Add(categoryAddDto,"Ahmet Burak YÜNKÜL");
+				var result = await _categoryService.Add(categoryAddDto, "Ahmet Burak YÜNKÜL");
 				if (result.ResultStatus == ResultStatus.Success)
 				{
 					var categoryAddAjaxModel = JsonSerializer.Serialize(new CategoryAddAjaxViewModel
 					{
 						CategoryDto = result.Data,
-						CategoryAddPartial = await this.RenderViewToStringAsync("_CategoryAddPartial",categoryAddDto)
+						CategoryAddPartial = await this.RenderViewToStringAsync("_CategoryAddPartial", categoryAddDto)
 					});
 					return Json(categoryAddAjaxModel);
 				}
@@ -65,6 +65,14 @@ namespace ProgrammersBlog.Mvc.Areas.Admin.Controllers
 				ReferenceHandler = ReferenceHandler.Preserve
 			});
 			return Json(categories);
+		}
+
+		[HttpPost]
+		public async Task<JsonResult> Delete(int categoryId)
+		{
+			var result = await _categoryService.Delete(categoryId, "Ahmet Burak Yünkül");
+			var ajaxResult = JsonSerializer.Serialize(result);
+			return Json(ajaxResult);
 		}
 	}
 }
