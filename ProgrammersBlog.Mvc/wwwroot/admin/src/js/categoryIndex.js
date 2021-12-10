@@ -49,7 +49,7 @@
                                     <td>${convertToShortDate(category.ModifiedDate)}</td>
                                     <td>${category.ModifiedByName}</td>
                                     <td>
-                                <button class="btn btn-primary btn-sm btn-block"><span class="fas fa-edit"></span></button>
+                                <button class="btn btn-primary btn-sm btn-update btn-block" data-id="${category.Id}"><span class="fas fa-edit"></span></button>
                                 <button class="btn btn-danger btn-sm btn-delete btn-block" data-id="${category.Id}"><span class="fas fa-minus-circle"></span></button>
                                     </td>
                                             </tr>`;
@@ -151,7 +151,7 @@
                                                     <td>${convertToShortDate(categoryAddAjaxModel.CategoryDto.Category.ModifiedDate)}</td>
                                                     <td>${categoryAddAjaxModel.CategoryDto.Category.ModifiedByName}</td>
                                                     <td>
-                                                        <button class="btn btn-primary btn-sm btn-block"><span class="fas fa-edit"></span></button>
+                                                        <button class="btn btn-primary btn-sm btn-update btn-block"  data-id="${categoryAddAjaxModel.CategoryDto.Category.Id}"><span class="fas fa-edit"></span></button>
                                                         <button class="btn btn-danger btn-sm btn-delete btn-block" data-id="${categoryAddAjaxModel.CategoryDto.Category.Id}"><span class="fas fa-minus-circle"></span></button>
                                                     </td>
                                                 </tr>`;
@@ -225,4 +225,24 @@
                 }
             });
         });
+    /* Ajax POST / Deleting a Category ends  here */
+
+    /*Ajax UPDATE / Posting the FormData as CategoryUpdateDto starts from here*/
+
+    $(function () {
+        const url = '/Admin/Category/Update/';
+        const placeHolderDiv = $('#modalPlaceHolder');
+        $(document).on('click',
+            '.btn-update',
+            function (event) {
+                event.preventDefault();
+                const id = $(this).attr('data-id');
+                $.get(url, { categoryId: id }).done(function (data) {
+                    placeHolderDiv.html(data);
+                    placeHolderDiv.find('.modal').modal('show');
+                }).fail(function () {
+                    toastr.error("Bir hata oluştu.");
+                });
+            });
+    });
 });
