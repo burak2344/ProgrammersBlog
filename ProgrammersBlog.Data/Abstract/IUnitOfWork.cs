@@ -11,8 +11,6 @@ namespace ProgrammersBlog.Data.Abstract
 		//Burada Tüm Repositoryleri tek merkezden yöneteceğiz.
 		IArticleRepository Articles { get; }
 		ICommentRepository Comments { get; }
-		IRoleRepository Roles { get; }
-		IUserRepository Users { get; }
 		ICategoryRepository Categories { get; } //_unitOfWork.Categories.AddAsync();
 
 

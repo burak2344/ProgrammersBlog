@@ -15,8 +15,7 @@ namespace ProgrammersBlog.Data.Concrete
 		private EfArticleRepository _articleRepository;
 		private EfCategoryRepository _categoryRepository;
 		private EfCommentRepository _commentRepository;
-		private EfRoleRepository _roleRepository;
-		private EfUserRepository _userRepository;
+
 
 		public UnitOfWork(ProgrammersBlogContext context)
 		{
@@ -26,10 +25,6 @@ namespace ProgrammersBlog.Data.Concrete
 		public IArticleRepository Articles => _articleRepository ?? new EfArticleRepository(_context);
 
 		public ICommentRepository Comments => _commentRepository ?? new EfCommentRepository(_context);
-
-		public IRoleRepository Roles => _roleRepository ?? new EfRoleRepository(_context);
-
-		public IUserRepository Users => _userRepository ?? new EfUserRepository(_context);
 
 		public ICategoryRepository Categories => _categoryRepository ?? new EfCategoryRepository(_context);
 
