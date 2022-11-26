@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using ProgrammersBlog.Entities.ComplexTypes;
 using ProgrammersBlog.Entities.Dtos;
 using ProgrammersBlog.Mvc.Helpers.Abstract;
 using ProgrammersBlog.Shared.Utilities.Extensions;
@@ -18,7 +20,9 @@ namespace ProgrammersBlog.Mvc.Helpers.Concrete
     {
         private readonly IWebHostEnvironment _env;
         private readonly string _wwwroot;
-        private readonly string imgFolder = "img";
+        private const string imgFolder = "img";
+        private const string userImagesFolder = "userImages";
+        private const string postImagesFolder = "postImages";
 
         public ImageHelper(IWebHostEnvironment env)
         {
@@ -26,32 +30,51 @@ namespace ProgrammersBlog.Mvc.Helpers.Concrete
             _wwwroot = _env.WebRootPath;
         }
 
-        public async Task<IDataResult<ImageUploadedDto>> UploadUserImage(string userName, IFormFile pictureFile, string folderName="userImages")
+        public string Upload(string name, IFormFile pictureFile,PictureType pictureType ,string folderName=null)
         {
+
+            /* Eğer folderName değişkeni null gelir ise, o zaman resim tipine göre (PictureType) klasör adı ataması yapılır. */
+            folderName ??= pictureType == PictureType.User ? userImagesFolder : postImagesFolder;
+
+            /* Eğer folderName değişkeni ile gelen klasör adı sistemimizde mevcut değilse, yeni bir klasör oluşturulur. */
             if (!Directory.Exists($"{_wwwroot}/{imgFolder}/{folderName}"))
             {
                 Directory.CreateDirectory($"{_wwwroot}/{imgFolder}/{folderName}");
             }
+
+            /* Resimin yüklenme sırasındaki ilk adı oldFileName adlı değişkene atanır. */
             string oldFileName = Path.GetFileNameWithoutExtension(pictureFile.FileName);
+
+            /* Resimin uzantısı fileExtension adlı değişkene atanır. */
             string fileExtension = Path.GetExtension(pictureFile.FileName);
+
+
+            Regex regex = new Regex("[*'\",._&#^@]");
+            name = regex.Replace(name, string.Empty);
+
+
             DateTime dateTime = DateTime.Now;
-            // AlperTunga_587_5_38_12_3_10_2020.png
-            string newFileName = $"{userName}_{dateTime.FullDateAndTimeStringWithUnderscore()}{fileExtension}";
+            /*
+            // Parametre ile gelen değerler kullanılarak yeni bir resim adı oluşturulur.
+            // Örn: AlperTunga_587_5_38_12_3_10_2020.png
+            */
+            string newFileName = $"{name}_{dateTime.FullDateAndTimeStringWithUnderscore()}{fileExtension}";
+
+            /* Kendi parametrelerimiz ile sistemimize uygun yeni bir dosya yolu (path) oluşturulur. */
             var path = Path.Combine($"{_wwwroot}/{imgFolder}/{folderName}", newFileName);
-            await using (var stream = new FileStream(path, FileMode.Create))
+
+            /* Sistemimiz için oluşturulan yeni dosya yoluna resim kopyalanır. */
+            using (var stream = new FileStream(path, FileMode.Create))
             {
-                await pictureFile.CopyToAsync(stream);
+                pictureFile.CopyTo(stream);
             }
 
-            return new DataResult<ImageUploadedDto>(ResultStatus.Success,$"{userName} adlı kullanıcının resimi başarıyla yüklenmiştir.",new ImageUploadedDto
-            {
-                FullName = $"{folderName}/{newFileName}",
-                OldName = oldFileName,
-                Extension = fileExtension,
-                FolderName = folderName,
-                Path = path,
-                Size = pictureFile.Length
-            });
+            /* Resim tipine göre kullanıcı için bir mesaj oluşturulur. */
+            string nameMessage = pictureType == PictureType.User
+                ? $"{name} adlı kullanıcının resimi başarıyla yüklenmiştir."
+                : $"{name} adlı makalenin resimi başarıyla yüklenmiştir.";
+
+            return $"{folderName}/{newFileName}";
         }
 
         public IDataResult<ImageDeletedDto> Delete(string pictureName)
